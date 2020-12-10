@@ -85,9 +85,6 @@ describe('CRUD routes for Plant model', () => {
 
     const res = await request(app)
       .delete(`/api/v1/plants/${plant.id}`);
-    // .send({
-    //   location: 'Gentry, AR'
-    // });
 
     expect(res.body).toEqual({
       id: '1',
