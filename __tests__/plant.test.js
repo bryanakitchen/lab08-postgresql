@@ -3,6 +3,7 @@ const request = require('supertest');
 const pool = require('../lib/utils/pool');
 const app = require('../lib/app');
 const Plant = require('../lib/models/Plant');
+const Snack = require('../lib/models/Snack');
 
 describe('CRUD routes for Plant model', () => {
   
@@ -47,17 +48,31 @@ describe('CRUD routes for Plant model', () => {
     expect(res.body).toHaveLength(plants.length);
   });
 
-  it('Finds a Plant by id via GET', async() => {
-    const plant = await Plant.insert({
-      location: 'Chattanooga, TN'
-    });
+  it('Finds all Snacks associated with one Plant by Plant id via GET', async() => {
     
+    await Promise.all([
+      {
+        name: 'Nutty Buddy'
+      },
+      {
+        name: 'Oatmeal Creme Pies'
+      },
+      {
+        name: 'Star Crunch'
+      },
+    ].map(snack => Snack.insert(snack)));
+
+    const plant = await Plant.insert({
+      location: 'Chattanooga, TN',
+      snacks: ['Nutty Buddy', 'Oatmeal Creme Pies', 'Star Crunch']
+    });
+
     const res = await request(app)
       .get(`/api/v1/plants/${plant.id}`);
 
     expect(res.body).toEqual({
-      id: '1',
-      location: 'Chattanooga, TN'
+      ...plant,
+      snacks: expect.arrayContaining(['Nutty Buddy', 'Oatmeal Creme Pies', 'Star Crunch'])
     });
   });
 
